@@ -1,61 +1,58 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
-const TabsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  align-items: center;
+const TabContainer = styled.div`
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
 `;
 
-const TabHeaders = styled.div`
+const TabButtons = styled.div`
   display: flex;
   justify-content: center;
-  background: #f4f4f4;
-  padding: 10px;
-  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
 `;
 
 const TabButton = styled.button`
-  background: ${(props) => (props.active ? "#8884d8" : "white")};
-  color: ${(props) => (props.active ? "white" : "black")};
-  border: 1px solid #ddd;
   padding: 10px 20px;
-  margin: 0 5px;
+  border: none;
+  background: ${props => props.active ? '#007bff' : '#f8f9fa'};
+  color: ${props => props.active ? 'white' : 'black'};
   cursor: pointer;
-  border-radius: 5px 5px 0 0;
+  margin: 0 5px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
 
   &:hover {
-    background: #ddd;
+    background: ${props => props.active ? '#0056b3' : '#e9ecef'};
   }
 `;
 
 const TabContent = styled.div`
-  width: 100%;
-  background: white;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 0 0 8px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const Tabs = ({ tabs }) => {
+const Tabs = ({ children }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <TabsWrapper>
-      <TabHeaders>
-        {tabs.map((tab, index) => (
+    <TabContainer>
+      <TabButtons>
+        {React.Children.map(children, (child, index) => (
           <TabButton
-            key={index}
             active={activeTab === index}
             onClick={() => setActiveTab(index)}
           >
-            {tab.label}
+            {child.props.label}
           </TabButton>
         ))}
-      </TabHeaders>
-      <TabContent>{tabs[activeTab].content}</TabContent>
-    </TabsWrapper>
+      </TabButtons>
+      <TabContent>
+        {React.Children.toArray(children)[activeTab]}
+      </TabContent>
+    </TabContainer>
   );
 };
 

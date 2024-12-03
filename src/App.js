@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line 
+} from "recharts";
 import Header from "./components/Header";
 import Metadata from "./components/Metadata";
 import Dots from "./components/Dots";
@@ -22,16 +33,56 @@ const AppWrapper = styled.div`
   justify-content: center;
 `;
 
-const ChartWrapper = styled.div`
+const ContentContainer = styled.div`
   width: 80%;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const TabButtons = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
+`;
+
+const TabButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  background: ${props => props.active ? '#8884d8' : 'white'};
+  color: ${props => props.active ? 'white' : '#333'};
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: ${props => props.active ? '#8884d8' : '#f0f0f0'};
+  }
+`;
+
+const ChartWrapper = styled.div`
+  width: 100%;
   height: 400px;
-  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const TableWrapper = styled.div`
-  width: 80%;
-  margin: 20px auto;
+  width: 100%;
+  margin: 0;
   overflow-x: auto;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
 `;
 
 const StyledTable = styled.table`
@@ -40,6 +91,7 @@ const StyledTable = styled.table`
   background: white;
   border-radius: 8px;
   overflow: hidden;
+  table-layout: fixed;
 `;
 
 const StyledTh = styled.th`
@@ -47,12 +99,19 @@ const StyledTh = styled.th`
   background-color: #8884d8;
   color: white;
   padding: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  width: 33.33%;
 `;
 
 const StyledTd = styled.td`
   text-align: left;
   padding: 10px;
   border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const StyledLink = styled.a`
@@ -69,6 +128,7 @@ const App = () => {
   const [playersData, setPlayersData] = useState([]);
   const [referralsData, setReferralsData] = useState([]);
   const [totalPaid, setTotalPaid] = useState(0);
+  const [activeTab, setActiveTab] = useState('chart');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,85 +229,107 @@ const App = () => {
     <AppWrapper>
       <Header />
       <Dots />
+    
+
+      {/* Content Section */}
+      <ContentContainer>
+        <TabButtons>
+          <TabButton 
+            active={activeTab === 'chart'} 
+            onClick={() => setActiveTab('chart')}
+          >
+            Time Difference Chart
+          </TabButton>
+          <TabButton 
+            active={activeTab === 'players'} 
+            onClick={() => setActiveTab('players')}
+          >
+            Players Data
+          </TabButton>
+          <TabButton 
+            active={activeTab === 'referrals'} 
+            onClick={() => setActiveTab('referrals')}
+          >
+            Referrals Data
+          </TabButton>
+        </TabButtons>
+
+        {activeTab === 'chart' && (
+          <ChartWrapper>
+            <ResponsiveContainer>
+              <BarChart data={chartData}>
+                <XAxis dataKey="blockNumber" />
+                <YAxis dataKey="pressedAt" />
+                <Tooltip />
+                <Bar dataKey="pressedAt" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
+        )}
+
+        {activeTab === 'players' && (
+          <TableWrapper>
+            <StyledTable>
+              <thead>
+                <tr>
+                  <StyledTh>Player Address</StyledTh>
+                  <StyledTh>Paid Total (ETH)</StyledTh>
+                  <StyledTh>Total Presses</StyledTh>
+                </tr>
+              </thead>
+              <tbody>
+                {playersData.map((player) => (
+                  <tr key={player.playerAddress}>
+                    <StyledTd>
+                      <StyledLink
+                        href={`https://basescan.org/address/${player.playerAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {player.playerAddress}
+                      </StyledLink>
+                    </StyledTd>
+                    <StyledTd>{player.paidTotal.toFixed(3)}</StyledTd>
+                    <StyledTd>{player.totalPresses}</StyledTd>
+                  </tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </TableWrapper>
+        )}
+
+        {activeTab === 'referrals' && (
+          <TableWrapper>
+            <StyledTable>
+              <thead>
+                <tr>
+                  <StyledTh>Referral Address</StyledTh>
+                  <StyledTh>Referral Fee (ETH)</StyledTh>
+                  <StyledTh>Total Referrals</StyledTh>
+                </tr>
+              </thead>
+              <tbody>
+                {referralsData.map((referral) => (
+                  <tr key={referral.referralAddress}>
+                    <StyledTd>
+                      <StyledLink
+                        href={`https://basescan.org/address/${referral.referralAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {referral.referralAddress}
+                      </StyledLink>
+                    </StyledTd>
+                    <StyledTd>{referral.referralFee.toFixed(3)}</StyledTd>
+                    <StyledTd>{referral.totalReferrals}</StyledTd>
+                  </tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </TableWrapper>
+        )}
+      </ContentContainer>
       <Metadata price="0.001"  presses={totalPaid}  lastPress="barf.eth" />
-
-      {/* Chart Section */}
-      <ChartWrapper>
-        <ResponsiveContainer>
-          <BarChart data={chartData}>
-            <XAxis
-              dataKey="blockNumber"
-              label={{ value: "Block Number", position: "insideBottom", offset: -5 }}
-            />
-            <YAxis
-              dataKey="pressedAt"
-              label={{ value: "Time Difference", angle: -90, position: "insideLeft" }}
-            />
-            <Tooltip />
-            <Bar dataKey="pressedAt" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartWrapper>
-
-      {/* Players Table Section */}
-      <TableWrapper>
-        <StyledTable>
-          <thead>
-            <tr>
-              <StyledTh>Player Address</StyledTh>
-              <StyledTh>Paid Total (ETH)</StyledTh>
-              <StyledTh>Total Presses</StyledTh>
-            </tr>
-          </thead>
-          <tbody>
-            {playersData.map((player) => (
-              <tr key={player.playerAddress}>
-                <StyledTd>
-                  <StyledLink
-                    href={`https://basescan.org/address/${player.playerAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {player.playerAddress}
-                  </StyledLink>
-                </StyledTd>
-                <StyledTd>{player.paidTotal.toFixed(3)}</StyledTd>
-                <StyledTd>{player.totalPresses}</StyledTd>
-              </tr>
-            ))}
-          </tbody>
-        </StyledTable>
-      </TableWrapper>
-
-      {/* Referrals Table Section */}
-      <TableWrapper>
-        <StyledTable>
-          <thead>
-            <tr>
-              <StyledTh>Referral Address</StyledTh>
-              <StyledTh>Referral Fee (ETH)</StyledTh>
-              <StyledTh>Total Referrals</StyledTh>
-            </tr>
-          </thead>
-          <tbody>
-            {referralsData.map((referral) => (
-              <tr key={referral.referralAddress}>
-                <StyledTd>
-                  <StyledLink
-                    href={`https://basescan.org/address/${referral.referralAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {referral.referralAddress}
-                  </StyledLink>
-                </StyledTd>
-                <StyledTd>{referral.referralFee.toFixed(6)}</StyledTd>
-                <StyledTd>{referral.totalReferrals}</StyledTd>
-              </tr>
-            ))}
-          </tbody>
-        </StyledTable>
-      </TableWrapper>
     </AppWrapper>
   );
 };
