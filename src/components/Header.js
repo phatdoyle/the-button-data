@@ -61,7 +61,7 @@ const Header = () => {
         <Logo src={logo} alt="Logo" />
       </a>
 
-      <WalletInfo>0xD8C7...CE3B</WalletInfo>
+      <WalletInfo>Barf.eth</WalletInfo>
     </HeaderWrapper>
   );
 };

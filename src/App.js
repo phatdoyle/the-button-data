@@ -134,20 +134,20 @@ const App = () => {
     const fetchData = async () => {
       const query = `
         query MyQuery {
-          timeLefts(orderBy: "blockNumber", orderDirection: "desc", limit: 500) {
+          timeLefts(orderBy: "blockNumber", orderDirection: "desc", limit: 1000) {
             items {
               blockNumber
               pressedAt
             }
           }
-          players(orderBy: "paidTotal", orderDirection: "desc", limit: 20) {
+          players(orderBy: "paidTotal", orderDirection: "desc", limit: 100) {
             items {
               playerAddress
               paidTotal
               totalPresses
             }
           }
-          referrals(orderBy: "totalReferrals", orderDirection: "desc", limit: 20) {
+          referrals(orderBy: "totalReferrals", orderDirection: "desc", limit: 100) {
             items {
               referralAddress
               referralFee
@@ -183,7 +183,7 @@ const App = () => {
   
         // Process totalPaids data
         const totalPaidItem = json.data.totalPaids.items[0]?.paidTotal || 0;
-        const totalPaidInEth = totalPaidItem / 10 ** 1;
+        const totalPaidInEth = totalPaidItem / 10 ** 15;
   
         // Process other data as before
         const timeLefts = json.data.timeLefts.items.sort((a, b) => a.blockNumber - b.blockNumber);
@@ -257,10 +257,42 @@ const App = () => {
         {activeTab === 'chart' && (
           <ChartWrapper>
             <ResponsiveContainer>
-              <BarChart data={chartData}>
-                <XAxis dataKey="blockNumber" />
-                <YAxis dataKey="pressedAt" />
-                <Tooltip />
+              <BarChart 
+                data={chartData}
+                margin={{ top: 40, right: 30, bottom: 40, left: 60 }}
+              >
+                <text
+                  x="50%"
+                  y="20"
+                  fill="#8884d8"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  style={{ fontSize: '16px', fontWeight: 'bold' }}
+                >
+                  Time Between Presses
+                </text>
+                <XAxis 
+                  dataKey="blockNumber"
+                  label={{ 
+                    value: "Block Number", 
+                    position: "bottom",
+                    offset: 0
+                  }}
+                />
+                <YAxis 
+                  dataKey="pressedAt"
+                  label={{ 
+                    value: "Seconds Between Presses", 
+                    angle: -90,
+                    position: "insideLeft",
+                    offset: -10,
+                    dy: 70
+                  }}
+                />
+                <Tooltip 
+                  formatter={(value) => [`${value} seconds`, 'Time Between']}
+                  labelFormatter={(label) => `Block: ${label}`}
+                />
                 <Bar dataKey="pressedAt" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
