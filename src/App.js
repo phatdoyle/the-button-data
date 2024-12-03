@@ -19,50 +19,17 @@ const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-`;
-
-const TabsWrapper = styled.div`
-  width: 100%;
-  max-width: 800px;
-  margin: 20px 0;
-`;
-
-const TabHeaders = styled.div`
-  display: flex;
-  justify-content: space-around;
-  background: #f4f4f4;
-  padding: 10px;
-  border-bottom: 2px solid #ddd;
-`;
-
-const TabButton = styled.button`
-  background: ${(props) => (props.active ? "#8884d8" : "white")};
-  color: ${(props) => (props.active ? "white" : "black")};
-  border: 1px solid #ddd;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px 5px 0 0;
-
-  &:hover {
-    background: ${(props) => (props.active ? "#6652b8" : "#ddd")};
-  }
-`;
-
-const TabContent = styled.div`
-  padding: 20px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 0 0 8px 8px;
+  justify-content: center;
 `;
 
 const ChartWrapper = styled.div`
-  width: 100%;
+  width: 80%;
   height: 400px;
+  margin-top: 20px;
 `;
 
 const TableWrapper = styled.div`
-  width: 100%;
+  width: 80%;
   margin: 20px auto;
   overflow-x: auto;
 `;
@@ -72,6 +39,7 @@ const StyledTable = styled.table`
   border-collapse: collapse;
   background: white;
   border-radius: 8px;
+  overflow: hidden;
 `;
 
 const StyledTh = styled.th`
@@ -97,7 +65,6 @@ const StyledLink = styled.a`
 `;
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [playersData, setPlayersData] = useState([]);
   const [referralsData, setReferralsData] = useState([]);
@@ -154,9 +121,11 @@ const App = () => {
   
         const json = await response.json();
   
+        // Process totalPaids data
         const totalPaidItem = json.data.totalPaids.items[0]?.paidTotal || 0;
-        const totalPaidInEth = totalPaidItem / 10 ** 18;
+        const totalPaidInEth = totalPaidItem / 10 ** 1;
   
+        // Process other data as before
         const timeLefts = json.data.timeLefts.items.sort((a, b) => a.blockNumber - b.blockNumber);
         const formattedChartData = timeLefts.map((item, index) => {
           const pressedAtCurrent = item.pressedAt;
@@ -166,25 +135,27 @@ const App = () => {
             blockNumber: item.blockNumber,
             pressedAt: pressedAtPrevious
               ? pressedAtCurrent - pressedAtPrevious
-              : null,
+              : null, // First item has no previous value
           };
-        }).filter((item) => item.pressedAt !== null);
+        }).filter((item) => item.pressedAt !== null); // Remove invalid points
   
         const players = json.data.players.items.map((player) => ({
           playerAddress: player.playerAddress,
-          paidTotal: player.paidTotal / 10 ** 18,
+          paidTotal: player.paidTotal / 10 ** 18, // Adjust for Power(10, 18)
           totalPresses: player.totalPresses,
         }));
   
         const referrals = json.data.referrals.items.map((referral) => ({
           referralAddress: referral.referralAddress,
-          referralFee: referral.referralFee / 10 ** 18,
+          referralFee: referral.referralFee / 10 ** 18, // Adjust for Power(10, 18)
           totalReferrals: referral.totalReferrals,
         }));
   
         setChartData(formattedChartData);
         setPlayersData(players);
         setReferralsData(referrals);
+  
+        // Pass totalPaidInEth to Metadata
         setTotalPaid(totalPaidInEth);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -194,109 +165,89 @@ const App = () => {
     fetchData();
   }, []);
 
-  const tabs = [
-    {
-      label: "Time Between Presses",
-      content: (
-        <ChartWrapper>
-          <ResponsiveContainer>
-            <BarChart data={chartData}>
-              <XAxis dataKey="blockNumber" />
-              <YAxis dataKey="pressedAt" />
-              <Tooltip />
-              <Bar dataKey="pressedAt" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartWrapper>
-      ),
-    },
-    {
-      label: "Top Pressors",
-      content: (
-        <TableWrapper>
-          <StyledTable>
-            <thead>
-              <tr>
-                <StyledTh>Player Address</StyledTh>
-                <StyledTh>Paid Total (ETH)</StyledTh>
-                <StyledTh>Total Presses</StyledTh>
-              </tr>
-            </thead>
-            <tbody>
-              {playersData.map((player) => (
-                <tr key={player.playerAddress}>
-                  <StyledTd>
-                    <StyledLink
-                      href={`https://basescan.org/address/${player.playerAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {player.playerAddress}
-                    </StyledLink>
-                  </StyledTd>
-                  <StyledTd>{player.paidTotal.toFixed(3)}</StyledTd>
-                  <StyledTd>{player.totalPresses}</StyledTd>
-                </tr>
-              ))}
-            </tbody>
-          </StyledTable>
-        </TableWrapper>
-      ),
-    },
-    {
-      label: "Top Referrals",
-      content: (
-        <TableWrapper>
-          <StyledTable>
-            <thead>
-              <tr>
-                <StyledTh>Referral Address</StyledTh>
-                <StyledTh>Referral Fee (ETH)</StyledTh>
-                <StyledTh>Total Referrals</StyledTh>
-              </tr>
-            </thead>
-            <tbody>
-              {referralsData.map((referral) => (
-                <tr key={referral.referralAddress}>
-                  <StyledTd>
-                    <StyledLink
-                      href={`https://basescan.org/address/${referral.referralAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {referral.referralAddress}
-                    </StyledLink>
-                  </StyledTd>
-                  <StyledTd>{referral.referralFee.toFixed(3)}</StyledTd>
-                  <StyledTd>{referral.totalReferrals}</StyledTd>
-                </tr>
-              ))}
-            </tbody>
-          </StyledTable>
-        </TableWrapper>
-      ),
-    },
-  ];
-
   return (
     <AppWrapper>
       <Header />
       <Dots />
-      <TabsWrapper>
-        <TabHeaders>
-          {tabs.map((tab, index) => (
-            <TabButton
-              key={index}
-              active={activeTab === index}
-              onClick={() => setActiveTab(index)}
-            >
-              {tab.label}
-            </TabButton>
-          ))}
-        </TabHeaders>
-        <TabContent>{tabs[activeTab].content}</TabContent>
-      </TabsWrapper>
-      <Metadata price="0.001" presses={totalPaid} lastPress="barf.eth" />
+      <Metadata price="0.001"  presses={totalPaid}  lastPress="barf.eth" />
+
+      {/* Chart Section */}
+      <ChartWrapper>
+        <ResponsiveContainer>
+          <BarChart data={chartData}>
+            <XAxis
+              dataKey="blockNumber"
+              label={{ value: "Block Number", position: "insideBottom", offset: -5 }}
+            />
+            <YAxis
+              dataKey="pressedAt"
+              label={{ value: "Time Difference", angle: -90, position: "insideLeft" }}
+            />
+            <Tooltip />
+            <Bar dataKey="pressedAt" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartWrapper>
+
+      {/* Players Table Section */}
+      <TableWrapper>
+        <StyledTable>
+          <thead>
+            <tr>
+              <StyledTh>Player Address</StyledTh>
+              <StyledTh>Paid Total (ETH)</StyledTh>
+              <StyledTh>Total Presses</StyledTh>
+            </tr>
+          </thead>
+          <tbody>
+            {playersData.map((player) => (
+              <tr key={player.playerAddress}>
+                <StyledTd>
+                  <StyledLink
+                    href={`https://basescan.org/address/${player.playerAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {player.playerAddress}
+                  </StyledLink>
+                </StyledTd>
+                <StyledTd>{player.paidTotal.toFixed(3)}</StyledTd>
+                <StyledTd>{player.totalPresses}</StyledTd>
+              </tr>
+            ))}
+          </tbody>
+        </StyledTable>
+      </TableWrapper>
+
+      {/* Referrals Table Section */}
+      <TableWrapper>
+        <StyledTable>
+          <thead>
+            <tr>
+              <StyledTh>Referral Address</StyledTh>
+              <StyledTh>Referral Fee (ETH)</StyledTh>
+              <StyledTh>Total Referrals</StyledTh>
+            </tr>
+          </thead>
+          <tbody>
+            {referralsData.map((referral) => (
+              <tr key={referral.referralAddress}>
+                <StyledTd>
+                  <StyledLink
+                    href={`https://basescan.org/address/${referral.referralAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {referral.referralAddress}
+                  </StyledLink>
+                </StyledTd>
+                <StyledTd>{referral.referralFee.toFixed(6)}</StyledTd>
+                <StyledTd>{referral.totalReferrals}</StyledTd>
+              </tr>
+            ))}
+          </tbody>
+        </StyledTable>
+      </TableWrapper>
     </AppWrapper>
   );
 };
