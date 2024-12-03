@@ -1,6 +1,7 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import ghostLogo from "../assets/images/Powered_by_Ghost_dark.png";
+import DepartureMonoFont from "../assets/fonts/DepartureMono-Regular.woff2";
 
 const MetadataWrapper = styled.div`
   display: flex;
@@ -14,7 +15,6 @@ const MetadataWrapper = styled.div`
   border-radius: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   padding: 0;
-  font-family: "DepartureMono", monospace;
 `;
 
 const MetadataBox = styled.div`
@@ -40,6 +40,19 @@ const StyledLink = styled.a`
   
   &:hover {
     text-decoration: underline;
+  }
+`;
+
+const GlobalFontStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'DepartureMono';
+    src: url(${DepartureMonoFont}) format('woff2');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  ${MetadataWrapper}, ${MetadataBox}, ${StyledLink} {
+    font-family: 'DepartureMono', monospace !important;
   }
 `;
 
@@ -70,6 +83,7 @@ const GhostLogo = styled.img`
 const Metadata = ({ price, presses, lastPress }) => {
   return (
     <>
+      <GlobalFontStyle />
       <MetadataWrapper>
         <MetadataBox>
           Winner: <StyledLink 

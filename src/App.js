@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import { 
   BarChart, 
   Bar, 
@@ -16,6 +16,17 @@ import Header from "./components/Header";
 import Metadata from "./components/Metadata";
 import Dots from "./components/Dots";
 import bgImage from "./assets/images/bg.svg";
+
+const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'DepartureMono';
+    src: url('/assets/fonts/DepartureMono.otf') format('opentype');
+  }
+
+  * {
+    font-family: 'DepartureMono', monospace;
+  }
+`;
 
 const AppWrapper = styled.div`
   width: 100vw;
@@ -40,6 +51,15 @@ const ContentContainer = styled.div`
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'DepartureMono', monospace;
 `;
 
 const TabButtons = styled.div`
@@ -227,12 +247,14 @@ const App = () => {
 
   return (
     <AppWrapper>
+      <GlobalStyle />
       <Header />
       <Dots />
     
-
+      <Title>The Button: Data</Title>
       {/* Content Section */}
       <ContentContainer>
+       
         <TabButtons>
           <TabButton 
             active={activeTab === 'chart'} 
