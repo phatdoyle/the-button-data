@@ -146,6 +146,7 @@ const App = () => {
   const [referralsData, setReferralsData] = useState([]);
   const [totalPaid, setTotalPaid] = useState(0);
   const [activeTab, setActiveTab] = useState('chart');
+  const [averageTimeBetweenPresses, setAverageTimeBetweenPresses] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -234,6 +235,11 @@ const App = () => {
   
         // Pass totalPaidInEth to Metadata
         setTotalPaid(totalPaidInEth);
+  
+        // Calculate average
+        const averageTimeBetweenPresses = formattedChartData.reduce((sum, item) => sum + item.pressedAt, 0) / formattedChartData.length;
+        setAverageTimeBetweenPresses(averageTimeBetweenPresses);
+        console.log(averageTimeBetweenPresses);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -288,7 +294,7 @@ const App = () => {
                   dominantBaseline="middle"
                   style={{ fontSize: '16px', fontWeight: 'bold' }}
                 >
-                  Seconds Between Presses
+                  Seconds Between Presses (Avg: {averageTimeBetweenPresses.toFixed(2)}s)
                 </text>
                 <XAxis 
                   dataKey="blockNumber"

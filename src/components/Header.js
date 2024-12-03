@@ -29,26 +29,6 @@ const Logo = styled.img`
   }
 `;
 
-const WalletInfo = styled.div`
-  font-family: "DepartureMono", monospace;
-  font-size: 1rem; /* Default font size */
-  background: black;
-  color: white;
-  padding: 10px 20px; /* Default padding */
-  border-radius: 20px;
-
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    font-size: 0.9rem; /* Slightly smaller font size for medium screens */
-    padding: 8px 16px; /* Adjust padding for medium screens */
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem; /* Smaller font size for small screens */
-    padding: 6px 12px; /* Compact padding for small screens */
-  }
-`;
-
 const Header = () => {
   return (
     <HeaderWrapper>
