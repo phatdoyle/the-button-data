@@ -6,11 +6,7 @@ import {
   XAxis, 
   YAxis, 
   Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  LineChart,
-  Line 
+  ResponsiveContainer
 } from "recharts";
 import Header from "./components/Header";
 import Metadata from "./components/Metadata";
