@@ -6,7 +6,11 @@ import {
   XAxis, 
   YAxis, 
   Tooltip, 
-  ResponsiveContainer
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line 
 } from "recharts";
 import Header from "./components/Header";
 import Metadata from "./components/Metadata";
@@ -235,11 +239,10 @@ const App = () => {
   
         // Pass totalPaidInEth to Metadata
         setTotalPaid(totalPaidInEth);
-  
+
         // Calculate average
         const averageTimeBetweenPresses = formattedChartData.reduce((sum, item) => sum + item.pressedAt, 0) / formattedChartData.length;
         setAverageTimeBetweenPresses(averageTimeBetweenPresses);
-        console.log(averageTimeBetweenPresses);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -294,7 +297,7 @@ const App = () => {
                   dominantBaseline="middle"
                   style={{ fontSize: '16px', fontWeight: 'bold' }}
                 >
-                  Seconds Between Presses (Avg: {averageTimeBetweenPresses.toFixed(2)}s)
+                  Time Between Presses (Avg: {averageTimeBetweenPresses.toFixed(2)}s)
                 </text>
                 <XAxis 
                   dataKey="blockNumber"

@@ -15,6 +15,13 @@ const MetadataWrapper = styled.div`
   border-radius: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   padding: 0;
+  font-family: 'DepartureMono', monospace;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 95%;
+    bottom: 90px;
+  }
 `;
 
 const MetadataBox = styled.div`
@@ -25,6 +32,22 @@ const MetadataBox = styled.div`
   border-left: ${(props) => (props.withBorder ? "1px solid #dcdcdc" : "none")};
   background: ${(props) => (props.dark ? "#3d3d3d" : "white")};
   color: ${(props) => (props.dark ? "white" : "black")};
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    border-left: none;
+    border-top: ${(props) => (props.withBorder ? "1px solid #dcdcdc" : "none")};
+    
+    &:first-child {
+      border-radius: 20px 20px 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 20px 20px;
+    }
+  }
+
   &:first-child {
     border-left: none;
     border-radius: 20px 0 0 20px;
@@ -68,9 +91,8 @@ const PoweredByWrapper = styled.div`
   padding: 5px 10px;
   border-radius: 4px;
 
-  &:hover {
-    opacity: 0.9;
-    cursor: pointer;
+  @media (max-width: 768px) {
+    bottom: 20px;
   }
 `;
 
