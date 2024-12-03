@@ -6,11 +6,7 @@ import {
   XAxis, 
   YAxis, 
   Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  LineChart,
-  Line 
+  ResponsiveContainer
 } from "recharts";
 import Header from "./components/Header";
 import Metadata from "./components/Metadata";
@@ -42,6 +38,7 @@ const AppWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 `;
 
 const ContentContainer = styled.div`
@@ -291,7 +288,7 @@ const App = () => {
                   dominantBaseline="middle"
                   style={{ fontSize: '16px', fontWeight: 'bold' }}
                 >
-                  Time Between Presses
+                  Seconds Between Presses
                 </text>
                 <XAxis 
                   dataKey="blockNumber"

@@ -1,5 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import styled from "styled-components";
+
+const DotsContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+`;
 
 const Dot = styled.div`
   width: 10px;
@@ -56,12 +66,12 @@ const Dots = () => {
   }, []);
 
   return (
-    <>
+    <DotsContainer>
       {dots.map((dot) => (
         <Dot key={dot.id} top={dot.top} left={dot.left} color={dot.color} />
       ))}
-    </>
+    </DotsContainer>
   );
 };
 
-export default React.memo(Dots); // Correctly wrap the functional component with React.memo
+export default memo(Dots); // Memoize the component
